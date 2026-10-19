@@ -3,7 +3,7 @@ const path = require('path');
 const methodOverride = require('method-override');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3372;
 
 app.use(express.urlencoded({ extended: true }));
 // POST /todo/1?_method=PUT → PUT /todo/1 로 처리
@@ -27,6 +27,32 @@ app.post('/todo', (req, res) => {
   if (text) todos.push({ id: nextId++, text });
   res.redirect('/');
 });
+
+app.put('/todo/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const text = (req.body.text || '').trim();
+
+  const todo = todos.find(todo => todo.id === id);
+
+  if (!todo) {
+    return res.status(404).send('할 일을 찾을 수 없습니다.');
+  }
+
+  if (text) {
+    todo.text = text;
+  }
+
+  res.redirect('/');
+});
+
+app.delete('/todo/:id', (req, res) => {
+  const id = Number(req.params.id);
+
+  todos = todos.filter(todo => todo.id !== id);
+
+  res.redirect('/');
+});
+
 
 
 app.listen(PORT, () => {
